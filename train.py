@@ -18,6 +18,7 @@ $ torchrun --nproc_per_node=8 --nnodes=2 --node_rank=1 --master_addr=123.456.123
 
 import math
 import os
+import sys
 import time
 from contextlib import nullcontext
 from datetime import datetime
@@ -35,9 +36,9 @@ from export import model_export
 # I/O
 out_dir = "out"
 eval_interval = 50
-log_interval = 5
+log_interval = 1
 eval_iters = 10
-eval_only = True  # if True, script exits right after the first eval
+eval_only = False  # if True, script exits right after the first eval
 always_save_checkpoint = False  # if True, always save a checkpoint after each eval
 init_from = "scratch"  # 'scratch' or 'resume'
 # wandb logging
@@ -45,7 +46,7 @@ wandb_log = False  # disabled by default
 wandb_project = "llamac"
 wandb_run_name = "run" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 # data
-batch_size = 8  # if gradient_accumulation_steps > 1, this is the micro-batch size
+batch_size = 2  # if gradient_accumulation_steps > 1, this is the micro-batch size
 max_seq_len = 1024
 vocab_source = "custom" # llama2|custom; use Lllama 2 vocab from Meta, or custom trained
 vocab_size = 48000 # the Llama 2 tokenizer has 32K tokens
@@ -57,7 +58,7 @@ n_kv_heads = 8
 multiple_of = 32
 dropout = 0.0
 # adamw optimizer
-gradient_accumulation_steps = 4  # used to simulate larger batch sizes
+gradient_accumulation_steps = 64  # used to simulate larger batch sizes
 learning_rate = 2e-4  # max learning rate
 max_iters = 10 # total number of training iterations
 weight_decay = 1e-1
@@ -198,7 +199,10 @@ checkpoint = None  # free up memory
 if compile:
     print("compiling the model... (takes a ~minute)")
     unoptimized_model = model
-    model = torch.compile(model)  # requires PyTorch 2.0
+    if compile and not sys.platform.startswith('win'):
+        print("compiling the model... (takes a ~minute)")
+        unoptimized_model = model
+        model = torch.compile(model)  # requires PyTorch 2.0  # requires PyTorch 2.0
 
 # wrap model into DDP container
 if ddp:

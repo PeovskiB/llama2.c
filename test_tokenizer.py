@@ -24,17 +24,7 @@ def main():
     sp_model = load_sp_model(model_path)
 
     # Input sentence to encode and decode
-    input_sentence = """
-    class Foo {
-    public function test(...$args) {
-        var_dump($args);
-    }
-
-    public static function test2(...$args) {
-        var_dump($args);
-    }
-}
-    """
+    input_sentence = """Јанко петел јаваше, чавките сакаат макарони"""
 
     # Print the number of words in the sentence
     num_words = len(input_sentence.split())
