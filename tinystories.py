@@ -17,6 +17,7 @@ import sentencepiece as spm
 import torch
 import torch.distributed as dist
 from tqdm import tqdm
+import zipfile
 
 from tokenizer import Tokenizer
 
@@ -44,10 +45,10 @@ def download():
 
     # download the TinyStories dataset, unless it's already downloaded
     data_url = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories_all_data.tar.gz"
-    data_filename = os.path.join(DATA_CACHE_DIR, "TinyStories_all_data.tar.gz")
+    data_filename = os.path.join(DATA_CACHE_DIR, "first_data_utf.zip")
     if not os.path.exists(data_filename):
         print(f"Downloading {data_url} to {data_filename}...")
-        download_file(data_url, data_filename)
+        #download_file(data_url, data_filename)
     else:
         print(f"{data_filename} already exists, skipping download...")
 
@@ -56,7 +57,8 @@ def download():
     if not os.path.exists(data_dir):
         os.makedirs(data_dir, exist_ok=True)
         print(f"Unpacking {data_filename}...")
-        os.system(f"tar -xzf {data_filename} -C {data_dir}")
+        with zipfile.ZipFile(data_filename, 'r') as zip_ref:
+            zip_ref.extractall(data_dir)
     else:
         print(f"{data_dir} already exists, skipping unpacking...")
 
@@ -80,20 +82,21 @@ def train_vocab(vocab_size):
     prefix = os.path.join(DATA_CACHE_DIR, f"tok{vocab_size}")
 
     # how many shards we'll use for vocab training, kept low for efficiency
-    num_shards = 10
+    num_shards = 31
 
     # 1) export a large chunk of text as a single text file tiny.txt
     tiny_file = os.path.join(DATA_CACHE_DIR, "tiny.txt")
     data_dir = os.path.join(DATA_CACHE_DIR, "TinyStories_all_data")
     shard_filenames = sorted(glob.glob(os.path.join(data_dir, "*.json")))
+    random.shuffle(shard_filenames)
 
     print(f"Writing temporary file {tiny_file} with {num_shards} shards...")
     with open(tiny_file, "w", encoding="utf-8") as of:
         for shard in tqdm(shard_filenames[:num_shards]):
-            with open(shard, "r") as f:
+            with open(shard, "r", encoding="utf-8") as f: #EDITED
                 data = json.load(f)
             for example in data:
-                text = example["story"]
+                text = example["text"]
                 text = text.strip()
                 of.write(text + "\n")
     print(f"Size is: {os.path.getsize(tiny_file) / 1024 / 1024:.2f} MB")
@@ -106,10 +109,11 @@ def train_vocab(vocab_size):
                                    vocab_size=vocab_size,
                                    self_test_sample_size=0,
                                    input_format="text",
-                                   character_coverage=1.0,
+                                   character_coverage=0.9995,
                                    num_threads=os.cpu_count(),
                                    split_digits=True,
                                    allow_whitespace_only_pieces=True,
+                                   remove_extra_whitespaces=False,
                                    byte_fallback=True,
                                    unk_surface=r" \342\201\207 ",
                                    normalization_rule_name="identity")
@@ -128,11 +132,11 @@ def process_shard(args, vocab_size):
     shard_id, shard = args
     tokenizer_model = get_tokenizer_model_path(vocab_size)
     enc = Tokenizer(tokenizer_model)
-    with open(shard, "r") as f:
+    with open(shard, "r", encoding="utf8") as f: #EDITED
         data = json.load(f)
     all_tokens = []
     for example in tqdm(data, position=shard_id):
-        text = example["story"]
+        text = example["text"]
         text = text.strip()  # get rid of leading/trailing whitespace
         tokens = enc.encode(text, bos=True, eos=False)  # encode the text, use BOS
         all_tokens.extend(tokens)

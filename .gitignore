@@ -1,4 +1,6 @@
 /env
-/data
+/data/TinyStories_all_data
+/data/tiny.txt
+/data/tok*
 /.idea
 /__pycache__
