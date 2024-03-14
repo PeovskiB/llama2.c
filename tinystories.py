@@ -17,7 +17,7 @@ import sentencepiece as spm
 import torch
 import torch.distributed as dist
 from tqdm import tqdm
-import zipfile
+import rarfile
 
 from tokenizer import Tokenizer
 
@@ -53,11 +53,12 @@ def download():
         print(f"{data_filename} already exists, skipping download...")
 
     # unpack the tar.gz file into all the data shards (json files)
-    data_dir = os.path.join(DATA_CACHE_DIR, "TinyStories_all_data")
+    #data_dir = os.path.join(DATA_CACHE_DIR, "TinyStories_all_data")
+    data_dir = DATA_CACHE_DIR
     if not os.path.exists(data_dir):
         os.makedirs(data_dir, exist_ok=True)
         print(f"Unpacking {data_filename}...")
-        with zipfile.ZipFile(data_filename, 'r') as zip_ref:
+        with rarfile.Rarfile(data_filename, 'r') as zip_ref:
             zip_ref.extractall(data_dir)
         os.system(f"tar -xzf {data_filename} -C {data_dir}")
     else:

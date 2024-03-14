@@ -35,14 +35,14 @@ from export import model_export
 # I/O
 out_dir = "out"
 eval_interval = 50
-log_interval = 1
+log_interval = 5
 eval_iters = 10
 eval_only = False  # if True, script exits right after the first eval
 always_save_checkpoint = False  # if True, always save a checkpoint after each eval
 init_from = "scratch"  # 'scratch' or 'resume'
 # wandb logging
-wandb_log = False  # disabled by default
-wandb_project = "llamac"
+wandb_log = True  # disabled by default
+wandb_project = "finkigpt"
 wandb_run_name = "run" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 # data
 batch_size = 16  # if gradient_accumulation_steps > 1, this is the micro-batch size
@@ -287,7 +287,7 @@ while True:
             }
             print(f"saving checkpoint to {out_dir}")
             torch.save(checkpoint, os.path.join(out_dir, f"ckpt{iter_num}.pt"))
-        elif losses["val"] < best_val_loss or always_save_checkpoint:
+        if losses["val"] < best_val_loss or always_save_checkpoint:
             best_val_loss = losses["val"]
             if iter_num > 0:
                 checkpoint = {
