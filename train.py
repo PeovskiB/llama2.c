@@ -45,7 +45,7 @@ wandb_log = True  # disabled by default
 wandb_project = "finkigpt"
 wandb_run_name = "run" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 # data
-batch_size = 16  # if gradient_accumulation_steps > 1, this is the micro-batch size
+batch_size = 12  # if gradient_accumulation_steps > 1, this is the micro-batch size
 max_seq_len = 1024
 vocab_source = "custom" # llama2|custom; use Lllama 2 vocab from Meta, or custom trained
 vocab_size = 45000 # the Llama 2 tokenizer has 32K tokens
