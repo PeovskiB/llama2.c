@@ -44,11 +44,11 @@ def download():
     os.makedirs(DATA_CACHE_DIR, exist_ok=True)
 
     # download the TinyStories dataset, unless it's already downloaded
-    data_url = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories_all_data.tar.gz"
-    data_filename = os.path.join(DATA_CACHE_DIR, "first_data_utf.zip")
+    data_url = "https://huggingface.co/datasets/Borjan/nlp-test1/resolve/main/tok45000.rar"
+    data_filename = os.path.join(DATA_CACHE_DIR, "tok45000.rar")
     if not os.path.exists(data_filename):
         print(f"Downloading {data_url} to {data_filename}...")
-        #download_file(data_url, data_filename)
+        download_file(data_url, data_filename)
     else:
         print(f"{data_filename} already exists, skipping download...")
 
@@ -59,6 +59,7 @@ def download():
         print(f"Unpacking {data_filename}...")
         with zipfile.ZipFile(data_filename, 'r') as zip_ref:
             zip_ref.extractall(data_dir)
+        os.system(f"tar -xzf {data_filename} -C {data_dir}")
     else:
         print(f"{data_dir} already exists, skipping unpacking...")
 
