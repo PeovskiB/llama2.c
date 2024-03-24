@@ -4,3 +4,6 @@
 /data/tok*
 /.idea
 /__pycache__
+/finkigpt140M
+finkigpt140.bin
+/charts
