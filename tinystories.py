@@ -140,7 +140,7 @@ def process_shard(args, vocab_size):
     for example in tqdm(data, position=shard_id):
         text = example["text"]
         text = text.strip()  # get rid of leading/trailing whitespace
-        tokens = enc.encode(text, bos=True, eos=False)  # encode the text, use BOS
+        tokens = enc.encode(text, bos=True, eos=True)  # encode the text, use BOS
         all_tokens.extend(tokens)
     # convert to uint16 nparray
     all_tokens = np.array(all_tokens, dtype=np.uint16)
@@ -159,7 +159,7 @@ def process_shard(args, vocab_size):
         f.write(all_tokens.tobytes())
     # calculate the average sequence length (they are separated by BOS=1)
     avg_seq_len = all_tokens.size / ((all_tokens == 1).sum())
-    print(f"Saved {tokenized_filename}, average seqlen: {avg_seq_len:.2f}")
+    print(f"Saved {tokenized_filename}, average seqlen: {avg_seq_len:.2f}, all seqlen: {all_tokens.size}")
 
 
 def pretokenize(vocab_size):
