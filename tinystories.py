@@ -114,6 +114,8 @@ def train_vocab(vocab_size):
                                    character_coverage=0.9995,
                                    num_threads=os.cpu_count(),
                                    split_digits=True,
+                                   split_by_unicode_script=False,
+                                   split_by_number=False,
                                    allow_whitespace_only_pieces=True,
                                    remove_extra_whitespaces=False,
                                    byte_fallback=True,
