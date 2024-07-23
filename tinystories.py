@@ -84,7 +84,7 @@ def train_vocab(vocab_size):
     prefix = os.path.join(DATA_CACHE_DIR, f"tok{vocab_size}")
 
     # how many shards we'll use for vocab training, kept low for efficiency
-    num_shards = 31
+    num_shards = 20
 
     # 1) export a large chunk of text as a single text file tiny.txt
     tiny_file = os.path.join(DATA_CACHE_DIR, "tiny.txt")

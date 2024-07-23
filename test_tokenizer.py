@@ -18,13 +18,75 @@ def decode_tokens(sp_model, tokens):
 
 def main():
     # File path to the trained SentencePiece model
-    model_path = "D:\\NLP\\Test Q1\\llama2.c\\data\\tok45000.model"
+    model_path = "data/tok4000.model"
 
     # Load SentencePiece model
     sp_model = load_sp_model(model_path)
 
     # Input sentence to encode and decode
-    input_sentence = """Јанко петел јаваше, чавките сакаат макарони"""
+    input_sentence = """Server: Republic of Centar after WW3 (Skina konec serverov)
+Channel: u-park
+Date: 2018-04
+
+bokalce:
+:FeelsBadMan: te smeev u eden yt...
+
+bokalce:
+epa borjan toa
+
+bokalce:
+jas nisto ja neam rodenden
+
+_tosho:
+legit neame drug aven iam bez van pravi ja
+
+_tosho:
+ez game e
+
+_tosho:
+probably
+
+_tosho:
+i smeci
+
+bokalce:
+predme pocnam i mean
+
+_tosho:
+site bea goleming cuck
+
+bokalce:
+i ne znam so kur koga postojat
+
+_tosho:
+epa po kratko ne cita komstot
+
+_tosho:
+znaci ke ti e broken rexyning jop
+
+bokalce:
+koga si zemes maener + policst
+
+_tosho:
+abe i da go stais frizelechsko
+
+_tosho:
+jas legit samo
+
+_tosho:
+wait
+
+bokalce:
+xd
+
+bokalce:
+xd
+
+bokalce:
+dude
+
+_tosho:
+sega spiev u 19:20"""
 
     # Print the number of words in the sentence
     num_words = len(input_sentence.split())
