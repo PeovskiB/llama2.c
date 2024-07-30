@@ -44,14 +44,15 @@ init_from = "scratch"  # 'scratch' or 'resume'
 wandb_log = True  # disabled by default
 wandb_project = "finkigpt"
 wandb_run_name = "run" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+wandb_api_key = ""
 # data
-batch_size = 12  # if gradient_accumulation_steps > 1, this is the micro-batch size
-max_seq_len = 1024
+batch_size = 1  # if gradient_accumulation_steps > 1, this is the micro-batch size
+max_seq_len = 2048
 vocab_source = "custom" # llama2|custom; use Lllama 2 vocab from Meta, or custom trained
 vocab_size = 32000 # the Llama 2 tokenizer has 32K tokens
 # model
-dim = 768
-n_layers = 12
+dim = 1536
+n_layers = 24
 n_heads = 12
 n_kv_heads = 4
 multiple_of = 32
@@ -242,6 +243,7 @@ def get_lr(it):
 # logging
 if wandb_log and master_process:
     import wandb
+    wandb.login(key=wandb_api_key)
     wandb.init(project=wandb_project, name=wandb_run_name, config=config)
 
 # training loop
