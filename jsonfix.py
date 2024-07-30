@@ -21,6 +21,7 @@ def main():
         if filename.endswith('.json'):
             filepath = os.path.join(args.directory, filename)
             convert_json_to_utf8(filepath)
+            print(f"Converted {filepath} to UTF-8 encoding")
 
 if __name__ == "__main__":
     main()

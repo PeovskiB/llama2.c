@@ -48,7 +48,7 @@ wandb_run_name = "run" + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 batch_size = 12  # if gradient_accumulation_steps > 1, this is the micro-batch size
 max_seq_len = 1024
 vocab_source = "custom" # llama2|custom; use Lllama 2 vocab from Meta, or custom trained
-vocab_size = 45000 # the Llama 2 tokenizer has 32K tokens
+vocab_size = 32000 # the Llama 2 tokenizer has 32K tokens
 # model
 dim = 768
 n_layers = 12
@@ -69,7 +69,7 @@ decay_lr = True  # whether to decay the learning rate
 warmup_iters = 10  # how many steps to warm up for
 # system
 device = "cuda"  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
-dtype = "float16"  # float32|bfloat16|float16
+dtype = "bfloat16"  # float32|bfloat16|float16
 compile = True  # use PyTorch 2.0 to compile the model to be faster
 # -----------------------------------------------------------------------------
 config_keys = [

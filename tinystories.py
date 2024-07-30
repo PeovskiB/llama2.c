@@ -84,7 +84,7 @@ def train_vocab(vocab_size):
     prefix = os.path.join(DATA_CACHE_DIR, f"tok{vocab_size}")
 
     # how many shards we'll use for vocab training, kept low for efficiency
-    num_shards = 31
+    num_shards = 70#9
 
     # 1) export a large chunk of text as a single text file tiny.txt
     tiny_file = os.path.join(DATA_CACHE_DIR, "tiny.txt")
@@ -134,47 +134,49 @@ def process_shard(args, vocab_size):
     shard_id, shard = args
     tokenizer_model = get_tokenizer_model_path(vocab_size)
     enc = Tokenizer(tokenizer_model)
-    with open(shard, "r", encoding="utf8") as f: #EDITED
+    with open(shard, "r", encoding="utf8") as f:
         data = json.load(f)
     all_tokens = []
     for example in tqdm(data, position=shard_id):
         text = example["text"]
-        text = text.strip()  # get rid of leading/trailing whitespace
-        tokens = enc.encode(text, bos=True, eos=True)  # encode the text, use BOS
+        text = text.strip()
+        tokens = enc.encode(text, bos=True, eos=True)
         all_tokens.extend(tokens)
-    # convert to uint16 nparray
+    
     all_tokens = np.array(all_tokens, dtype=np.uint16)
-    # calculate the output filename
+    
     if vocab_size == 0:
-        # if we're using Llama 2, just save the tokenized file in the same dir
         tokenized_filename = shard.replace(".json", ".bin")
     else:
-        # save .bin files into a new tok{N} directory
         bin_dir = os.path.join(DATA_CACHE_DIR, f"tok{vocab_size}")
         shard_basename = os.path.basename(shard)
         bin_basename = shard_basename.replace(".json", ".bin")
         tokenized_filename = os.path.join(bin_dir, bin_basename)
-    # write the bytes
+    
     with open(tokenized_filename, "wb") as f:
         f.write(all_tokens.tobytes())
-    # calculate the average sequence length (they are separated by BOS=1)
+    
     avg_seq_len = all_tokens.size / ((all_tokens == 1).sum())
-    print(f"Saved {tokenized_filename}, average seqlen: {avg_seq_len:.2f}, all seqlen: {all_tokens.size}")
+    print(f"Saved {tokenized_filename}, tokens: {all_tokens.size}, average seqlen: {avg_seq_len:.2f}")
+    
+    return all_tokens.size  # Return the number of tokens in this shard
 
 
 def pretokenize(vocab_size):
-    # iterate the shards and tokenize all of them one by one
     data_dir = os.path.join(DATA_CACHE_DIR, "TinyStories_all_data")
     shard_filenames = sorted(glob.glob(os.path.join(data_dir, "*.json")))
     if vocab_size > 0:
-        # .bin files will be saved into tok{N} directory, create it once here
         bin_dir = os.path.join(DATA_CACHE_DIR, f"tok{vocab_size}")
         os.makedirs(bin_dir, exist_ok=True)
 
-    # process all the shards in a process pool
     fun = partial(process_shard, vocab_size=vocab_size)
+    total_tokens = 0
+    
     with ProcessPoolExecutor() as executor:
-        executor.map(fun, enumerate(shard_filenames))
+        for tokens in executor.map(fun, enumerate(shard_filenames)):
+            total_tokens += tokens
+    
+    print(f"Pretokenization complete. Total tokens in dataset: {total_tokens}")
     print("Done.")
 
 

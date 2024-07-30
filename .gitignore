@@ -7,3 +7,7 @@
 /finkigpt140M
 finkigpt140.bin
 /charts
+/.venv
+/data
+/wandb
+/out
