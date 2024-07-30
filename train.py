@@ -72,6 +72,7 @@ warmup_iters = 10  # how many steps to warm up for
 device = "cuda"  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
 dtype = "bfloat16"  # float32|bfloat16|float16
 compile = True  # use PyTorch 2.0 to compile the model to be faster
+checkpoint_save_rate = 5000
 # -----------------------------------------------------------------------------
 config_keys = [
     k
@@ -84,7 +85,7 @@ config = {k: globals()[k] for k in config_keys}  # will be useful for logging
 
 # fixing some hyperparams to sensible defaults
 lr_decay_iters = max_iters  # should be ~= max_iters per Chinchilla
-min_lr = 0.0  # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
+min_lr = 3.5e-5  # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
 
 # validating checks
 assert vocab_source in ["llama2", "custom"]
@@ -278,7 +279,7 @@ while True:
             except Exception as e:
                 print(f"logging to wandb failed: {e}")
         # saves a checkpoint each 1000th
-        if iter_num % 1000 == 0:
+        if iter_num % checkpoint_save_rate == 0:
             checkpoint = {
                 "model": raw_model.state_dict(),
                 "optimizer": optimizer.state_dict(),
