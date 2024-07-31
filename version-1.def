@@ -1,0 +1,38 @@
+Bootstrap: docker
+From: nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04
+
+%post
+    # Update package lists
+    apt-get update -y
+
+    # Install prerequisites and Python 3.10
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3.10 \
+        python3.10-venv \
+        python3.10-dev \
+        python3-tk \
+        python3-pip \
+        python3-setuptools \
+        unzip \
+        unrar
+
+    # Clean up
+    rm -rf /var/lib/apt/lists/*
+
+    # Upgrade pip to the latest version
+    python3.10 -m pip install --upgrade pip
+
+    # Install PyTorch and related packages
+    python3.10 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+    # Install Python packages
+    python3.10 -m pip install \
+        numpy==1.23.5 \
+        pytest==7.4.0 \
+        requests==2.31.0 \
+        sentencepiece==0.1.99 \
+        tqdm==4.64.1 \
+        wandb==0.15.5 \
+        rarfile \
+        zipfile
+
